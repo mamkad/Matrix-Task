@@ -52,25 +52,26 @@ bool matrix_multiplication::multiply(matrix const& leftmatr, matrix const& right
 
 void matrix_multiplication::mult(matrix const& leftmatr, matrix const& rightmatr) {
     while (true) {
+
+        mtx_.lock();
         size_t row = 0, coll = 0;
         if (count_of_calc_element < resmatr_.size()) {
             row  = count_of_calc_element / resmatr_.rows();
             coll = count_of_calc_element % resmatr_.colls();
+            mtx_.unlock();
         } else {
+            mtx_.unlock();
             break;
         }
-        
+
         matrix_element_t total = 0;
         size_t common = leftmatr.colls();
         for (size_t k = 0; k < common; ++k) {
             total += leftmatr.at(row, k) * rightmatr.at(k, coll);
         }
-
-        mtx_.lock();
         resmatr_.at(row, coll) = total;
-        mtx_.unlock();
-
-        ++count_of_calc_element; //atomic
+        
+        ++count_of_calc_element; // atomic
 
         std::this_thread::sleep_for(std::chrono::milliseconds(sleep_sec_));
         //cout << std::this_thread::get_id() << ' ' << count_of_calc_element << '\n';
