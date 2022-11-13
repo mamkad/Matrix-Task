@@ -1,3 +1,5 @@
+#include "matrix.hpp"
+
 #include <algorithm>
 #include <fstream> 
 #include <sstream> 
@@ -6,24 +8,21 @@
 
 using std::cout;
 using std::copy_n;
-using std::string;
 using std::ostringstream;
 using std::ofstream;
 using std::ifstream;
 using std::ios_base;
 using std::setw;
-using std::endl;
-using std::left;
-
-#include "matrix.hpp"
 
 void matrix::reset() {
-    buff_ = nullptr;
-    colls_ = rows_ = buffsize_ = 0;
+   buff_ = nullptr;
+   rows_ = 0;
+   colls_ = 0;
+   buffsize_ = 0;
 }
 
-matrix::matrix(size_t c, size_t r) {
-    resize(c, r);
+matrix::matrix(size_t r, size_t c) {
+    resize(r, c);
 }
 
 matrix::~matrix() {
@@ -31,13 +30,13 @@ matrix::~matrix() {
 }
 
 matrix::matrix(matrix const& m) {
-    resize(m.colls_, m.rows_);
+    resize(m.rows_, m.colls_);
 	copy_n(m.buff_, buffsize_, buff_);
 }
 
 matrix::matrix(matrix&& m) {
+    rows_ = m.rows_;
     colls_ = m.colls_;
-	rows_ = m.rows_;
 	buffsize_ = m.buffsize_;
 	buff_ = m.buff_;
 	m.reset();
@@ -47,7 +46,7 @@ matrix& matrix::operator= (matrix const& m) {
     if (this == &m) {
 		return *this;
 	}
-    resize(m.colls_, m.rows_);
+    resize(m.rows_, m.colls_);
 	copy_n(m.buff_, buffsize_, buff_);
     return *this;
 }
@@ -57,8 +56,8 @@ matrix& matrix::operator= (matrix && m) {
 		return *this;
 	}
     clear();
+    rows_ = m.rows_;
 	colls_ = m.colls_;
-	rows_ = m.rows_;
 	buffsize_ = m.buffsize_;
 	buff_ = m.buff_;
 	m.reset();
@@ -69,28 +68,28 @@ void matrix::clear() {
     if (isempty()) {
         return;
     }
-    delete[] buff_;
+    delete[] buff_; // ()_
     reset();
 }
 
-size_t matrix::isempty() const noexcept {
+bool matrix::isempty() const noexcept {
     return (buff_ == nullptr);
 }
 
-void matrix::resize(size_t c, size_t r) {
+void matrix::resize(size_t r, size_t c) {
     clear();
-    colls_ = c;
     rows_ = r;
-    buffsize_ = colls_ * rows_;
+    colls_ = c;
+    buffsize_ = rows_ * colls_;
     buff_ = new matrix_element_t[buffsize_];
 }
 
 matrix_element_t& matrix::at(size_t i, size_t j) {
-    return buff_[i * rows_ + j];
+    return buff_[i * colls_ + j];
 }
 
 matrix_element_t const& matrix::at(size_t i, size_t j) const {
-    return buff_[i * rows_ + j];
+    return buff_[i * colls_ + j];
 }
 
 size_t matrix::colls() const noexcept {
@@ -109,22 +108,18 @@ bool matrix::readfromfile(string const& fnamein) {
     ifstream fin(fnamein);
 
     if (!fin) {
-        cout << "\n\tFile not found: " + fnamein + '\n';
         return false;
     }
 
-    size_t colls, rows;
-    if ( !(fin >> colls >> rows) ) {
-        cout << "\n\tWrong size of matrixes\n";
+    size_t rows, colls;
+    if ( !(fin >> rows >> colls) ) {
         return false;
     }
 
-    resize(colls, rows);
-    for(size_t i = 0; i < colls_; ++i) {
-        for(size_t j = 0; j < rows_; ++j) {
-            cout << i << ' ' << j << '\n';
+    resize(rows, colls);
+    for(size_t i = 0; i < rows_; ++i) {
+        for(size_t j = 0; j < colls_; ++j) {   
             if (!(fin >> at(i, j))) {
-                cout << "\n\tElement is not a number\n";
                 return false;
             }
         }
@@ -138,18 +133,17 @@ bool matrix::writetofile(string const& fnameout) {
     ofstream fout(fnameout, ios_base::app);
 
     if (!fout) {
-        cout << "\n\tError of file open: " + fnameout + '\n';
         return false;
     }
 
     ostringstream stream;
-    for(size_t i = 0, stri = 0; i < colls_; ++i) {
-        for(size_t j = 0; j < rows_; ++j) {
+    for(size_t i = 0, stri = 0; i < rows_; ++i) {
+        for(size_t j = 0; j < colls_; ++j) {
             stream << at(i, j);
-            if (j < rows_ - 1) {
+            if (j < colls_ - 1) {
                 stream << setw(20);
             } else {
-                 stream << endl;
+                 stream << '\n';
             }
         }
     }
@@ -159,4 +153,15 @@ bool matrix::writetofile(string const& fnameout) {
     fout.close();
 
     return true;
+}
+
+void matrix::print() {
+    cout << "\n\tresult:\n\t";
+    for(size_t i = 0; i < rows_; ++i) {
+        for(size_t j = 0; j < colls_; ++j) {   
+            cout << at(i, j) << setw(5);
+        }
+        cout << "\n\t";
+    }
+    cout << '\n';
 }
