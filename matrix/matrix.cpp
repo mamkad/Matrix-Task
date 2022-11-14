@@ -116,12 +116,14 @@ bool matrix::readfromfile(string const& fnamein) {
 	
     // if file is not open
     if (!fin) {
+	cout << "\n\tFile not found: " + fnamein + '\n';
         return false;
     }
 
     // the first two numbers in the file are interpreted as rows and columns of the matrix
     size_t rows, colls;
     if ( !(fin >> rows >> colls) ) {
+	cout << "\n\tUnable to convert characters to rows and columns\n";
         return false;
     }
     
@@ -130,6 +132,7 @@ bool matrix::readfromfile(string const& fnamein) {
     for(size_t i = 0; i < rows_; ++i) {
         for(size_t j = 0; j < colls_; ++j) {   
             if (!(fin >> at(i, j))) {
+		cout << "\n\tUnable to convert character at position: " +  i + ", " + j + " to matrix element\n";
                 return false;
             }
         }
@@ -144,6 +147,7 @@ bool matrix::writetofile(string const& fnameout) {
     
     // if file is not open
     if (!fout) {
+	cout << "\n\Error with open/creating file: " + fnamein + '\n';
         return false;
     }
     
