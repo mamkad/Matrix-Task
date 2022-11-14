@@ -12,12 +12,12 @@ using matrix_element_t = double;
 
 class matrix {
     private:
-        matrix_element_t* buff_ = nullptr;
-        size_t rows_ = 0, colls_ = 0;
-        size_t buffsize_ = 0;
+        matrix_element_t* buff_ = nullptr;  // matrix data
+        size_t rows_ = 0, colls_ = 0;       // rows and colls
+        size_t buffsize_ = 0;               // size of buffer (rows_ * colls_)
 
     private:
-        void reset();   // обнулить параметры
+        void reset();   // reset params
 
     public:
         matrix() = default;
@@ -31,21 +31,20 @@ class matrix {
         matrix& operator= (matrix &&);
 
     public:
-        void clear();  // удалить всё содержимое
-        void resize(size_t, size_t);
+        void clear();                    // clear matrix content
+        void resize(size_t, size_t);     // resize matrix. if matrix was not empty, old content is deleting
 
     public:
-        matrix_element_t& at(size_t, size_t);
-        matrix_element_t const& at(size_t, size_t) const;
-        size_t rows()  const noexcept;
+        matrix_element_t& at(size_t, size_t);               // get matrix element by i and j without check
+        matrix_element_t const& at(size_t, size_t) const;   // get matrix element by i and j without check
+    
+        size_t rows()  const noexcept; 
         size_t colls() const noexcept;
-        size_t size()  const noexcept;
-        bool isempty() const noexcept;
-
+        size_t size()  const noexcept; // size of buffer (rows_ * colls_)
+        bool isempty() const noexcept; // check 
+    
     public:
-
-    public:
-        bool readfromfile(string const&);
+        bool readfromfile(string const&); 
         bool writetofile(string const&); 
         void print();
 };
