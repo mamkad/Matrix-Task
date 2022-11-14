@@ -132,7 +132,7 @@ bool matrix::readfromfile(string const& fnamein) {
     for(size_t i = 0; i < rows_; ++i) {
         for(size_t j = 0; j < colls_; ++j) {   
             if (!(fin >> at(i, j))) {
-		cout << "\n\tUnable to convert character at position: " +  i + ", " + j + " to matrix element\n";
+		cout << "\n\tUnable to convert character at position: " <<  i << ", " << j << " to matrix element\n";
                 return false;
             }
         }
@@ -147,7 +147,7 @@ bool matrix::writetofile(string const& fnameout) {
     
     // if file is not open
     if (!fout) {
-	cout << "\n\Error with open/creating file: " + fnamein + '\n';
+	cout << "\n\Error with open/creating file: " + fnameout + '\n';
         return false;
     }
     
