@@ -147,7 +147,7 @@ bool matrix::writetofile(string const& fnameout) {
         return false;
     }
     
-    // convert matrix conent to str 
+    // convert matrix content to str 
     ostringstream stream;
     for(size_t i = 0, stri = 0; i < rows_; ++i) {
         for(size_t j = 0; j < colls_; ++j) {
